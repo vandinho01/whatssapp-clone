@@ -76,7 +76,7 @@ class WhatssappController{
             this.getForm().forEach((value, key) => {
 
                 json[key] = value;
-                
+
             });
 
             return json;
@@ -148,6 +148,50 @@ class WhatssappController{
             let formData = new FormData(this.el.formPanelAddContact);
 
         });
+
+        this.el.contactsMessagesList.querySelectorAll('.contact-item').forEach((item) => {
+
+            item.on('click', e=> {
+
+                this.el.home.hide();
+                this.el.main.css({    
+                    display:'flex'
+                });
+
+            });
+
+        });
+
+        this.el.btnAttach.on('click', e=> {
+
+            e.stopPropagation();
+            this.el.menuAttach.addClass('open');
+            document.addEventListener('click', this.closeMenuAttach.bind(this));
+
+        });
+
+        this.el.btnAttachPhoto.on('click', e => {
+
+        });
+
+        this.el.btnAttachCamera.on('click', e => {
+
+        });
+
+        this.el.btnAttachDocument.on('click', e => {
+
+        });
+        
+        this.el.btnAttachContact.on('click', e => {
+
+        });
+
+    }
+
+    closeMenuAttach(e){
+
+        document.removeEventListener('click', this.closeMenuAttach);
+        this.el.menuAttach.removeClass('open');
 
     }
 
