@@ -13,7 +13,7 @@ class WhatssappController{
         //Vai receber todos os elementos 
         this.el = {};
 
-        document.querySelectorAll('[id').forEach(element=>{
+        document.querySelectorAll('[id]').forEach(element=>{
             this.el[Format.getCamelCase(element.id)] = element;
         });
 
@@ -31,7 +31,7 @@ class WhatssappController{
             return this;
         }
 
-        Element.prototype.toogle = function(){
+        Element.prototype.toggle = function(){
             this.style.display = (this.style.display === 'none') ? 'block' : 'none';
             return this;
         }
@@ -144,7 +144,7 @@ class WhatssappController{
 
         this.el.formPanelAddContact.on('submit', e=>{
 
-            e.preventDefault;
+            e.preventDefault();
             let formData = new FormData(this.el.formPanelAddContact);
 
         });
@@ -178,11 +178,11 @@ class WhatssappController{
 
         this.el.inputPhoto.click('change', e=>{
 
-            [...this.el.inputPhoto.files.forEach(file=>{
+            [...this.el.inputPhoto].files.forEach(file=>{
 
                 console.log(file);
 
-            })]
+            });
 
         });
 
@@ -276,7 +276,7 @@ class WhatssappController{
         // se for true executa o primeiro if 
         this.el.inputText.on('keyup', e=> {
 
-            if(this.el.inputText.innerHTML.lenght) {
+            if(this.el.inputText.innerHTML.length) {
 
                 this.el.inputPlaceholder.hide();
                 this.el.btnSendMicrophone.hide();
@@ -298,20 +298,36 @@ class WhatssappController{
         // configurando o botão para abrir e fechear os emojis
         this.el.btnEmojis.on('click', e=> {
 
-            this.el.panelEmojis.toogleClass('open');
+            this.el.panelEmojis.classList.toggle('open');
 
         });
         
         // ao clicar no emoji ele aparece no console
         // faz um forEach de cada emoji e configurando o evento para que ele busque o emoji clicado e
         // exiba no console
-        this.el.pannelEmojius.querySelectorAll('.emojik').forEach(emoji=>{
+        this.el.panelEmojis.querySelectorAll('.emojik').forEach(emoji=>{
 
             emoji.on('click', e=> {
-                console.log(emoji.dataset.unicode);
+                // img recebe o clone do emoji para adicionar ao texto
+                let img = this.el.imgEmojiDefault.cloneNode();
+                // neste trecho copio o estilo css, o dataset unicode que seria o emoji
+                img.style.cssText = emoji.style.cssText;
+                img.dataset.unicode = emoji.dataset.unicode;
+                img.alt = emoji.dataset.unicode;
+                // busca o nome da classe do emoji e adicionar na img o nome da classe do emoji
+                emoji.classList.forEach(name=>{
+                    img.classList.add(name);
+                });
+                // adiciona o emoji no textp
+                this.el.inputText.appendChild(img);
+                // força com que o javascript execute o evento ao clicar ou soltar o botão
+                this.el.inputText.dispatchEvent(new Event('keyup'));
+
             });
 
-        })
+        });
+
+
     }
 
     // contato o tempo do audio
