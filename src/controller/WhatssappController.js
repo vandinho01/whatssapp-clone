@@ -193,6 +193,8 @@ class WhatssappController{
             this.el.panelCamera.css({
                 'height' : 'calc(100% - 120px)'
             });
+            // instanciando minha camera e passando o elemento onde o video vai ser executado
+            this._camera = new CameraController(this.el.videoCamera);
 
         });
 
