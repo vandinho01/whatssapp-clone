@@ -318,8 +318,28 @@ class WhatssappController{
                 emoji.classList.forEach(name=>{
                     img.classList.add(name);
                 });
-                // adiciona o emoji no textp
-                this.el.inputText.appendChild(img);
+
+                //Localizar o cursor 
+                let cursor = window.getSelection();
+                 // se o campo que o user estiver digitando não for o inputText ele foca no inputText
+                if(!cursor.focusNode || !cursor.focusNode.id == 'input-text'){
+                    this.el.inputText.focus();
+                    cursor = window.getSelection();
+                }
+                // cria um intervalo para manipular o texto
+                let range = document.createRange();
+                // busca a posição atual do cursor
+                range = cursor.getRangeAt(0);
+                // limpa o texto selecionado pelo user
+                range.deleteContents();
+                // cria um documento vazio para incluir depois no campo texto
+                let frag = document.createDocumentFragment();
+                
+                frag.appendChild(img);
+                // coloca a imagem do fragmento na posição exata
+                range.insertNode(frag);
+                // ajusta o cursor para depois da imagem incluida
+                range.setStartAfter(img);
                 // força com que o javascript execute o evento ao clicar ou soltar o botão
                 this.el.inputText.dispatchEvent(new Event('keyup'));
 
