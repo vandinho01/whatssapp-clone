@@ -205,6 +205,8 @@ export class WhatssappController{
 
             this.closeAllMainPanel();
             this.el.panelMessagesContainer.show();
+            //quando fechar o painel a camera será parada
+            this._camera.stop();
 
         });
 

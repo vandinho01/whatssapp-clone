@@ -1,6 +1,6 @@
 export class CameraController{
     //Criando o contructor da classe que recebe o elemento do VideoEl
-    contructor(videoEl){
+    constructor(videoEl){
         //Cria um tributo privado
         this._videoEl = videoEl;
         // api navigator para media, acessar a media do user com o getUserMedia
@@ -10,14 +10,19 @@ export class CameraController{
         navigator.mediaDevices.getUserMedia({
             video: true
         }).then(stream=>{
-            // como stream é um objeto e o videoEl não consegue ler um objeto e sim o link 
-            // transformo o objeto numa URL
-            this._videoEl.src = URL.createObjectURL(stream);
+            this._stream = stream
+            this._videoEl.srcObject = stream;
             // força o video a tocar
             this._videoEl.play();
 
         }).catch(err=>{
             console.error(err);
+        });
+    }
+
+    stop (){
+        this._stream.getTracks().forEach(track=>{
+            track.stop();
         });
     }
 
