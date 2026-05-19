@@ -1,3 +1,8 @@
+const pdfjsLib = require('pdfjs-dist');
+const path = require('path');
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = path.resolve(__dirname, '../../dist/pdf.worker.bundle.js');
+
 export class DocumentPreviewController {
     // recebe o file como paramentro e coloco dentro de um atributo privado
     constructor(file) {
@@ -10,17 +15,13 @@ export class DocumentPreviewController {
     getPreviewData() {
 
         return new Promise((resolve, reject) => {
-
+            let reader = new FileReader();
             switch (this._file.type) {
 
                 case 'image/png':
                 case 'image/jpeg':
                 case 'image/jpg':
                 case 'image/gif':
-
-                    // caso eles sejam algum dos listados acima, uso o FileReader para ler estes arquivos
-                    // instancio o File Reader
-                    let reader = new FileReader();
                     // se ele conseguir carregar executa o resolve passando o src do arquivo e o nome dele
                     reader.onload = e => {
 
@@ -42,7 +43,43 @@ export class DocumentPreviewController {
 
                 // caso ele seja um pdf 
                 case 'application/pdf':
+                    reader.onload = e => {
+                        let loadingTask = pdfjsLib.getDocument(new Uint8Array(reader.result));
 
+                        loadingTask.promise.then(pdf => {
+                            console.log('pdf', pdf);
+                            pdf.getPage(1).then(page => {
+                                
+                                let viewport = page.getViewport(1);
+                                let canvas = document.createElement('canvas');
+                                let canvasContext = canvas.getContext('2d')
+
+                                canvas.width = viewport.width;
+                                canvas.height = viewport.height;
+
+                                page.render({
+                                    canvasContext,
+                                    viewport
+                                }).then(() => {
+
+                                    let s = (pdf.numPafes > 1) ? 'resolve' : '';
+
+                                    resolve({
+                                        src: canvas.toDataURL('image/png'),
+                                        info: `${pdf.numPages} página${s}`
+                                    })
+                                }).catch(err => {
+                                    reject(err);
+                                });
+
+                            }).catch(err => {
+                                reject(err)
+                            })
+                        }).catch(err => {
+                            reject(err);
+                        });
+                    }
+                    reader.readAsArrayBuffer(this._file);
                     break;
                 // se não cair em nenhum caso da um reject
                 default:
