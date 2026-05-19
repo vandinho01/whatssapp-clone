@@ -1,4 +1,4 @@
-class CameraController{
+export class CameraController{
     //Criando o contructor da classe que recebe o elemento do VideoEl
     contructor(videoEl){
         //Cria um tributo privado
