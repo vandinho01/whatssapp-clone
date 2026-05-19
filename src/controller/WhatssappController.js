@@ -211,8 +211,38 @@ export class WhatssappController{
         });
 
         this.el.btnTakePicture.on('click', e=> {
+            // chamando o metodo quando eu clicar no botão de tirar a foto
+            // com isso ele me retorna a imagem
+            let dataUrl = this._camera.takePicture();
+            // passando a imagem que veio do takePicture para dentro do meu elemento
+            this.el.pictureCamera.src = dataUrl;
+            // agora eu mostro o meu elemento com a minha imagem
+            this.el.pictureCamera.show();
+            // ocultando o video
+            this.el.videoCamera.hide();
+            // aparecendo o botão para tirar a foto novamente 
+            this.el.btnReshootPanelCamera.show();
+            // ocultar o botão de tirar a foto
+            this.el.containerTakePicture.hide();
+            // mostrar o botão de enviar a foto
+            this.el.containerSendPicture.show();
 
-        })
+        });
+
+        this.el.btnReshootPanelCamera.on('click', e=> {
+
+            this.el.pictureCamera.hide();
+            this.el.videoCamera.show();
+            this.el.btnReshootPanelCamera.hide();
+            this.el.containerTakePicture.show();
+            this.el.containerSendPicture.hide();
+
+        });
+
+        //Enviar a foto
+        this.el.btnSendPicture.on('click', e=>{
+           console.lof(this.el.pictureCamera.src);
+        });
 
         this.el.btnAttachDocument.on('click', e => {
 
