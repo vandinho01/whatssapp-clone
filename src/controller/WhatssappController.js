@@ -1,5 +1,6 @@
 import {Format} from './../util/Format';
 import {CameraController} from './CameraController';
+import {DocumentPreviewController} from './DocumentPreviewController';
 
 export class WhatssappController{
 
@@ -251,31 +252,82 @@ export class WhatssappController{
             this.el.panelDocumentPreview.css({
                 'height' : 'calc(100% - 120px)'
             });
+            this.el.inputDocument.click();
 
         });
 
+        // O evento change é acionado quando o valor de um elemento de entrada (<input>) muda.
+        this.el.inputDocument.on('change', e => {
+            // se o input for true ele executa o codigo abaixo
+            if(this.el.inputDocument.files.length){
+                // file recebe os files que vem no pc do usuário
+                let file = this.el.inputDocument.files[0];
+                // crio um atributo que vai receber a minha classe para mostrar o documentos na tela
+                // a classe recebe como paramentro o meu file para tratar o arquivo
+                this._documentPreviewController = new DocumentPreviewController(file);
+                //retorno da minha promessa
+                this._documentPreviewController.getPreviewData().then(result=>{
+
+                    this.el.imgPanelDocumentPreview.src = result.src;
+                    // incluo o nome do arquivo 
+                    this.el.infoPanelDocumentPreview.innerHTML = result.info;
+                    this.el.imagePanelDocumentPreview.show();
+                    this.el.filePanelDocumentPreview.hide();
+
+                }).catch(err=>{
+                    switch(file.type){
+                        case 'application/nd.ms-excel':
+                        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-xls';
+                        break;
+
+                        case 'application/vnd.ms-powerpoint':
+                        case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-ppt';
+                        break;
+
+                        case 'application/msword':
+                        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-doc';
+                        break;
+                        // Se não for nenhum dos arquivos de cima, cai nesse default com uma imagem padrão
+                        default:
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+                            break;
+                    }
+
+                    this.el.filenamePanelDocumentPreview.innerHTML = file.name
+                    this.el.imagePanelDocumentPreview.hide();
+                    this.el.filePanelDocumentPreview.show();
+                }
+            
+            );
+
+            }
+        });
+        // fecha o elemento de escolher os documentos
         this.el.btnClosePanelDocumentPreview.on('click', e=> {
 
             this.closeAllMainPanel();
             this.el.panelMessagesContainer.show();
         })
-
+        // envia o documento
         this.el.btnSendDocument.on('click',e => {
 
         })
-        
+        // mostra os contatos
         this.el.btnAttachContact.on('click', e => {
 
             this.el.modalContacts.show()
 
         });
-
+        // retira o modal dos contatos
         this.el.btnCloseModalContacts.on('click', e => {
 
             this.el.modalContacts.hide()
 
         });
-
+        // inicia a gravação do audio
         this.el.btnSendMicrophone.on('click', e=> {
 
             this.el.recordMicrophone.show();
@@ -283,13 +335,13 @@ export class WhatssappController{
             this.startRecordMicrophoneTime();
 
         });
-
+        // cancela o audio
         this.el.btnCancelMicrophone.on('click', e=>{
 
             this.closeRecordMicrophone();
 
         });
-
+        //envia o audio
         this.el.btnFinishMicrophone.on('click', e=>{
 
             this.closeRecordMicrophone();
