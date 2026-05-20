@@ -350,6 +350,10 @@ export class WhatssappController {
 
             this._microphoneController = new MicrophoneController();
 
+            this._microphoneController.on('play', audio => {
+                console.log('Recebi o evento play', audio)
+            });
+
         });
         // cancela o audio
         this.el.btnCancelMicrophone.on('click', e => {
