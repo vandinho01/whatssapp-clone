@@ -350,22 +350,23 @@ export class WhatssappController {
 
             this._microphoneController = new MicrophoneController();
 
-            this._microphoneController.on('play', audio => {
-                console.log('Recebi o evento play', audio)
+            this._microphoneController.on('ready', musica => {
+                console.log('ready event');
+                this._microphoneController.startRecorder();
             });
 
         });
         // cancela o audio
         this.el.btnCancelMicrophone.on('click', e => {
 
-            this._microphoneController.stop();
+            this._microphoneController.stopRecorder();
             this.closeRecordMicrophone();
 
         });
         //envia o audio
         this.el.btnFinishMicrophone.on('click', e => {
 
-            this._microphoneController.stop();
+            this._microphoneController.stopRecorder();
             this.closeRecordMicrophone();
 
         });
