@@ -280,13 +280,13 @@ export class WhatssappController {
                     this.el.filePanelDocumentPreview.hide();
 
                     this.el.panelDocumentPreview.css({
-                        'height' : 'calc(100% - 120px)'
+                        'height': 'calc(100% - 120px)'
                     });
 
                 }).catch(err => {
 
                     this.el.panelDocumentPreview.css({
-                        'height' : 'calc(100% - 120px)'
+                        'height': 'calc(100% - 120px)'
                     });
 
                     switch (file.type) {
@@ -346,13 +346,18 @@ export class WhatssappController {
 
             this.el.recordMicrophone.show();
             this.el.btnSendMicrophone.hide();
-            this.startRecordMicrophoneTime();
 
             this._microphoneController = new MicrophoneController();
 
             this._microphoneController.on('ready', musica => {
                 console.log('ready event');
                 this._microphoneController.startRecorder();
+            });
+
+            this._microphoneController.on('recordtimer', timer => {
+
+                this.el.recordMicrophoneTimer.innerHTML = Format.toTime(timer);
+
             });
 
         });
@@ -462,24 +467,10 @@ export class WhatssappController {
 
     }
 
-    // contato o tempo do audio
-    startRecordMicrophoneTime() {
-
-        let start = Date.now();
-
-        this._recordMicrophoneInterval = setInterval(() => {
-
-            this.el.recordMicrophoneTimer.innerHTML = Format.toTime((Date.now() - start));
-
-        }, 1000)
-
-    }
-
     closeRecordMicrophone() {
 
         this.el.recordMicrophone.hide();
         this.el.btnSendMicrophone.show();
-        clearInterval(this._recordMicrophoneInterval);
 
     }
 

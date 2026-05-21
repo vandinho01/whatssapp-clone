@@ -4,7 +4,7 @@ export class MicrophoneController extends ClassEvent {
 
     constructor() {
         // chama o construtor do pai dele (classEvent)
-        super() 
+        super()
         // mimetype com o formato de audio
         this._mimeType = 'audio/webm'
         // valida se o audio está disponível
@@ -25,21 +25,21 @@ export class MicrophoneController extends ClassEvent {
         });
     }
     // retorna se o microfone esta disponível
-    isAvailable(){
+    isAvailable() {
 
         return this._available
 
     }
     // metodo para parar uma gravação
-    stop (){
-        this._stream.getTracks().forEach(track=>{
+    stop() {
+        this._stream.getTracks().forEach(track => {
             track.stop();
         });
     }
     // metodo para iniciar a gravação
-    startRecorder(){
-         // valida se inicou com o metodo
-        if(this.isAvailable()){
+    startRecorder() {
+        // valida se inicou com o metodo
+        if (this.isAvailable()) {
             // meu atributo recebe o MediaRecorder para gravação, passo meu stream e o objeto do mimetype
             this._mediaRecorder = new MediaRecorder(this._stream, {
                 mimeType: this._mimeType
@@ -51,13 +51,13 @@ export class MicrophoneController extends ClassEvent {
             // evento que guarda os pedaços de audio
             this._mediaRecorder.addEventListener('dataavailable', e => {
 
-                if(e.data.size > 0) this._recordedChunks.push(e.data);  // se o dado recebido for maior que 0 faz um push no array
+                if (e.data.size > 0) this._recordedChunks.push(e.data);  // se o dado recebido for maior que 0 faz um push no array
 
             });
             // quando parar a gravação com o blob ele cria um arquivo binário do meu array e o formato que passei
             this._mediaRecorder.addEventListener('stop', e => {
 
-                let blob = new Blob(this._recordedChunks,{
+                let blob = new Blob(this._recordedChunks, {
                     type: this._mimeType
                 });
                 // variavel que tem o nome do arquivo gerado
@@ -73,20 +73,39 @@ export class MicrophoneController extends ClassEvent {
             });
             // chama a midia para gravar
             this._mediaRecorder.start()
+            //chama a inicilização do timer
+            this._startTimer()
 
         }
 
     }
 
-    stopRecorder(){
+    stopRecorder() {
 
-        if(this.isAvailable()){
+        if (this.isAvailable()) {
 
             this._mediaRecorder.stop();
             this.stop();
+            this.stopTimer();
 
         }
 
+    }
+
+    startTimer() {
+
+        let start = Date.now();
+
+        this._recordMicrophoneInterval = setInterval(() => {
+
+            this.trigger('recordtimer', (Date.now() - start))
+
+        }, 1000)
+
+    }
+
+    stopTimer(){
+        clearInterval(this._recordMicrophoneInterval);
     }
 
 }
