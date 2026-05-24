@@ -4,6 +4,7 @@ import { MicrophoneController } from './MicrophoneController';
 import { DocumentPreviewController } from './DocumentPreviewController';
 import { Firebase } from '../util/Firebase';
 import { User } from '../model/User';
+import { Chat } from './../model/Chat'
 
 
 export class WhatssappController {
@@ -75,6 +76,7 @@ export class WhatssappController {
             docs.forEach(doc => {
 
                 let contact = doc.data();
+                console.log('contato do Firestore:', contact);
 
                 let div = document.createElement('div');
 
@@ -139,6 +141,8 @@ export class WhatssappController {
                 }
 
                 div.on('click', e => {
+
+                    console.log('contact-ID' , contact.chatId);
 
                     this.el.activeName.innerHTML = contact.name;
                     this.el.activeStatus = contact.status;
@@ -319,10 +323,26 @@ export class WhatssappController {
 
                 if (data.name) {
 
-                    this._user.addContact(contact).then(() => {
+                    Chat.createIfNotExists(this._user.email, contact.email).then(chat => {
+
+                        console.log('chat retornado:', chat);      // ← está chegando?
+                        console.log('chat.id:', chat.id);
+                        console.log('chat-id', chat.id)
+
+                        contact.chatId = chat.id;
+                        this._user.chatId = chat.id;
+
+                        console.log('contact.toJSON():', contact.toJSON()); // ← chatId aparece aqui?
+                        console.log('user.toJSON():', this._user.toJSON());
+
+                        contact.addContact(this._user);
+
+                        this._user.addContact(contact).then(() => {
 
                         this.el.btnClosePanelAddContact.click();
                         console.log('contato foi adicionado');
+
+                        });
 
                     });
 

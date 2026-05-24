@@ -3,27 +3,30 @@ import { Model } from './Model';
 
 export class User extends Model {
 
-    constructor(id){
+    constructor(id) {
 
         super();
-        
-        if(id) this.getById(id);
+
+        if (id) this.getById(id);
 
     }
 
-    get name(){return this._data.name}
-    set name(value){this._data.name = value}
+    get name() { return this._data.name }
+    set name(value) { this._data.name = value }
 
-    get email(){return this._data.email}
-    set email(value){this._data.email = value}
+    get email() { return this._data.email }
+    set email(value) { this._data.email = value }
 
-    get photo(){return this._data.photo}
-    set photo(value){this._data.photo = value}
+    get photo() { return this._data.photo }
+    set photo(value) { this._data.photo = value }
 
-    getById(id){
-        return new Promise((resolve, reject)=>{
+    get chatId() { return this._data.chatId }
+    set chatId(value) { this._data.chatId = value }
 
-            User.findByEmail(id).onSnapshot(doc=>{
+    getById(id) {
+        return new Promise((resolve, reject) => {
+
+            User.findByEmail(id).onSnapshot(doc => {
 
                 this.fromJSON(doc.data());
 
@@ -34,20 +37,20 @@ export class User extends Model {
         });
     }
 
-    save(){
+    save() {
 
         return User.findByEmail(this.email).set(this.toJSON())
 
     }
 
 
-    static getRef(){
+    static getRef() {
 
         return Firebase.db().collection('/users');
 
     }
 
-    static getContactsRef(id){
+    static getContactsRef(id) {
 
         return User.getRef()
             .doc(id)
@@ -55,23 +58,25 @@ export class User extends Model {
 
     }
 
-    static findByEmail(email){
+    static findByEmail(email) {
 
         return User.getRef().doc(email);
 
     }
 
-    addContact(contact){
+    addContact(contact) {
 
-        return getContactsRef(this.email)
+        const data = contact.toJSON();
+        console.log('salvando contato com data:', data); 
+        return User.getContactsRef(this.email)
             .doc(btoa(contact.email))
-            .set(contact.toJSON());
+            .set(data);
 
     }
 
-    getContacts(){
+    getContacts() {
 
-        return new Promise((resolve, reject)=>{
+        return new Promise((resolve, reject) => {
 
             User.getContactsRef(this.email).onSnapshot(docs => {
 
