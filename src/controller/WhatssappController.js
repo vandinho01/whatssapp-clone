@@ -4,7 +4,8 @@ import { MicrophoneController } from './MicrophoneController';
 import { DocumentPreviewController } from './DocumentPreviewController';
 import { Firebase } from '../util/Firebase';
 import { User } from '../model/User';
-import { Chat } from './../model/Chat'
+import { Chat } from './../model/Chat';
+import { Message } from './../model/Message';
 
 
 export class WhatssappController {
@@ -132,7 +133,7 @@ export class WhatssappController {
                             </div>
                 `;
 
-                if(contact.photo) {
+                if (contact.photo) {
 
                     let img = div.querySelector('.photo');
                     img.src = contact.photo;
@@ -142,21 +143,7 @@ export class WhatssappController {
 
                 div.on('click', e => {
 
-                    console.log('contact-ID' , contact.chatId);
-
-                    this.el.activeName.innerHTML = contact.name;
-                    this.el.activeStatus = contact.status;
-
-                    if(contact.photo) {
-                       let img = this.el.activePhoto;
-                       img.src = contact.photo;
-                       img.show();
-                    }
-
-                    this.el.home.hide();
-                    this.el.main.css({
-                        display: 'flex'
-                    });
+                    this.setActiveChat(contact);
 
                 });
 
@@ -167,6 +154,26 @@ export class WhatssappController {
         });
 
         this._user.getContacts();
+
+    }
+
+    setActiveChat(contact) {
+
+        this._contactActive = contact;
+
+        this.el.activeName.innerHTML = contact.name;
+        this.el.activeStatus = contact.status;
+
+        if (contact.photo) {
+            let img = this.el.activePhoto;
+            img.src = contact.photo;
+            img.show();
+        }
+
+        this.el.home.hide();
+        this.el.main.css({
+            display: 'flex'
+        });
 
     }
 
@@ -325,22 +332,17 @@ export class WhatssappController {
 
                     Chat.createIfNotExists(this._user.email, contact.email).then(chat => {
 
-                        console.log('chat retornado:', chat);      // ← está chegando?
-                        console.log('chat.id:', chat.id);
                         console.log('chat-id', chat.id)
 
                         contact.chatId = chat.id;
                         this._user.chatId = chat.id;
 
-                        console.log('contact.toJSON():', contact.toJSON()); // ← chatId aparece aqui?
-                        console.log('user.toJSON():', this._user.toJSON());
-
                         contact.addContact(this._user);
 
                         this._user.addContact(contact).then(() => {
 
-                        this.el.btnClosePanelAddContact.click();
-                        console.log('contato foi adicionado');
+                            this.el.btnClosePanelAddContact.click();
+                            console.log('contato foi adicionado');
 
                         });
 
@@ -609,6 +611,11 @@ export class WhatssappController {
         });
 
         this.el.btnSend.on('click', e => {
+
+            Message.send(this._contactActive, this._user.email, 'text', this.el.inputText.innerHTML);
+
+            this.el.inputText.innerHTML = '';
+            this.el.panelEmojis.removeClass('open');
 
         });
 
