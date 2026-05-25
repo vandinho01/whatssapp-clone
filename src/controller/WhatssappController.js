@@ -184,9 +184,9 @@ export class WhatssappController {
 
         Message.getRef(this._contactActive.chatId).orderBy('timeStamp').onSnapshot(docs => {
 
-            let scroolTop = this.el.panelMessagesContainer.scrollTop;
+            let scrollTop = this.el.panelMessagesContainer.scrollTop;
             let scrollTopMax = (this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight);
-            let autoScroll = (scroolTop >= scrollTopMax);
+            let autoScroll = (scrollTop >= scrollTopMax);
 
             docs.forEach(doc => {
 
@@ -313,7 +313,7 @@ export class WhatssappController {
     initEvents() {
 
         this.el.inputSearchContacts.on('keyup', e=>{
-            if (this.el.inputSearchContacts.value.lenght > 0) {
+            if (this.el.inputSearchContacts.value.length > 0) {
                 this.el.inputSearchContactsPlaceholder.hide();
             } else {
                 this.el.inputSearchContactsPlaceholder.show();
@@ -449,11 +449,11 @@ export class WhatssappController {
 
         });
 
-        this.el.inputPhoto.click('change', e => {
+        this.el.inputPhoto.on('change', e => {
 
-            [...this.el.inputPhoto].files.forEach(file => {
+            [...this.el.inputPhoto.files].forEach(file => {
 
-                console.log(file);
+                Message.sendImage(this._contactActive.chatId, this._user.email, file)
 
             });
 
@@ -511,7 +511,7 @@ export class WhatssappController {
 
         //Enviar a foto
         this.el.btnSendPicture.on('click', e => {
-            console.lof(this.el.pictureCamera.src);
+            console.log(this.el.pictureCamera.src);
         });
 
         this.el.btnAttachDocument.on('click', e => {
