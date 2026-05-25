@@ -273,7 +273,7 @@ export class Message extends Model {
 
             default:
                 div.innerHTML = `
-                    <div class="font-style _3DFk6 tail" id="${this.id}">
+                    <div class="font-style _3DFk6 tail" id="_${this.id}">
                         <span class="tail-container"></span>
                         <span class="tail-container highlight"></span>
                         <div class="Tkt2p">
@@ -282,7 +282,7 @@ export class Message extends Model {
                             </div>
                             <div class="_2f-RV">
                                 <div class="_1DZAH">
-                                    <span class="msg-time">${Format.timeStampTotime(this.timeStamp)}</span>
+                                    <span class="msg-time">${Format.timeStampToTime(this.timeStamp)}</span>
                                 </div>
                             </div>
                         </div>

@@ -27,9 +27,9 @@ export class Format{
 
     static dateToTime(date, locale = 'pt-BR'){
 
-        return date.toLocalTimeString(locale, {
-            hours: '2-digit',
-            minutes: '2-digit'
+        return date.toLocaleTimeString(locale, {
+            hour: '2-digit',
+            minute: '2-digit'
         });
 
     }
