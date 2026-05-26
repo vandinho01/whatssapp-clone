@@ -6,6 +6,7 @@ import { Firebase } from '../util/Firebase';
 import { User } from '../model/User';
 import { Chat } from './../model/Chat';
 import { Message } from './../model/Message';
+import { Base64 } from "../util/Base64";
 
 
 export class WhatssappController {
@@ -160,8 +161,8 @@ export class WhatssappController {
 
     setActiveChat(contact) {
 
-        if(this._contactActive) {
-            Message.getRef(this._contactActive.chatId).onSnapshot(()=> {});
+        if (this._contactActive) {
+            Message.getRef(this._contactActive.chatId).onSnapshot(() => { });
         }
 
         this._contactActive = contact;
@@ -198,9 +199,9 @@ export class WhatssappController {
 
                 let me = (data.from === this._user.email);
 
-                if(!this.el.panelMessagesContainer.querySelector('#_' + data.id)){
+                if (!this.el.panelMessagesContainer.querySelector('#_' + data.id)) {
 
-                    if(!me){
+                    if (!me) {
                         doc.ref.set({
                             status: 'read'
                         }, {
@@ -210,10 +211,19 @@ export class WhatssappController {
 
                     let view = message.getViewElement(me);
 
+                    this.el.panelMessagesContainer.querySelector('#_' + data.id).innerHTML = view.innerHTML
+
+                } else {
+
+                    let view = message.getViewElement(me);
                     this.el.panelMessagesContainer.appendChild(view);
 
-                } else if (me){
-                    let msgEl =  this.el.panelMessagesContainer.querySelector('#_' + data.id)
+
+                }
+
+
+                if (this.el.panelMessagesContainer.querySelector('#_' + data.id) && me) {
+                    let msgEl = this.el.panelMessagesContainer.querySelector('#_' + data.id)
 
                     msgEl.querySelector('.message-status').innerHTML = message.getStatusViewElement().outerHTML;
                 }
@@ -221,7 +231,7 @@ export class WhatssappController {
             });
 
 
-            if(autoScroll){
+            if (autoScroll) {
 
                 this.el.panelMessagesContainer.scrollTop = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight
 
@@ -312,7 +322,7 @@ export class WhatssappController {
 
     initEvents() {
 
-        this.el.inputSearchContacts.on('keyup', e=>{
+        this.el.inputSearchContacts.on('keyup', e => {
             if (this.el.inputSearchContacts.value.length > 0) {
                 this.el.inputSearchContactsPlaceholder.hide();
             } else {
@@ -519,10 +529,10 @@ export class WhatssappController {
             let mimeType = result[1];
             let ext = mimeType.split('/')[1];
             let filename = `camera${Date.now()}.${ext}`
-            
+
             let picture = new Image();
             picture.src = this.el.pictureCamera.src;
-            picture.onload = e =>{
+            picture.onload = e => {
 
                 let canvas = document.createElement('canvas');
                 let context = canvas.getContext('2d');
@@ -536,8 +546,8 @@ export class WhatssappController {
                 context.drawImage(picture, 0, 0, canvas.width, canvas.height);
 
                 fetch(canvas.toDataURL(mimeType))
-                    .then( res => { return res.arrayBuffer();})
-                    .then(buffer => {return new File([buffer], filename, { type: mimeType });})
+                    .then(res => { return res.arrayBuffer(); })
+                    .then(buffer => { return new File([buffer], filename, { type: mimeType }); })
                     .then(file => {
 
                         Message.sendImage(this._contactActive.chatId, this._user.email, file)
@@ -638,6 +648,27 @@ export class WhatssappController {
         })
         // envia o documento
         this.el.btnSendDocument.on('click', e => {
+
+            let file = this.el.inputDocument.files[0];
+            let base64 = this.el.imgPanelDocumentPreview.src;
+
+            if (fileType === 'apllication/pdf') {
+
+                Base64.toFile(base64).then(filePreview => {
+
+                    Message.sendDocument(this._contactActive.chatId, this._user.email, file, filePreview,
+                        this.el.infoPanelDocumentPreview.innerHTML);
+
+                });
+
+            } else {
+
+                Message.sendDocument(this._contactActive.chatId, this._user.email, file);
+
+            }
+
+            this.el.btnClosePanelDocumentPreview.click();
+
 
         })
         // mostra os contatos
