@@ -7,6 +7,7 @@ import { User } from '../model/User';
 import { Chat } from './../model/Chat';
 import { Message } from './../model/Message';
 import { Base64 } from "../util/Base64";
+import { ContactsController } from './ContactsController';
 
 
 export class WhatssappController {
@@ -168,7 +169,7 @@ export class WhatssappController {
         this._contactActive = contact;
 
         this.el.activeName.innerHTML = contact.name;
-        this.el.activeStatus = contact.status;
+        this.el.activeStatus.innerHTML = contact.status;
 
         if (contact.photo) {
             let img = this.el.activePhoto;
@@ -185,61 +186,42 @@ export class WhatssappController {
 
         Message.getRef(this._contactActive.chatId).orderBy('timeStamp').onSnapshot(docs => {
 
-            let scrollTop = this.el.panelMessagesContainer.scrollTop;
-            let scrollTopMax = (this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight);
-            let autoScroll = (scrollTop >= scrollTopMax);
+    let scrollTop = this.el.panelMessagesContainer.scrollTop;
+    let scrollTopMax = (this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight);
+    let autoScroll = (scrollTop >= scrollTopMax);
 
-            docs.forEach(doc => {
+    docs.forEach(doc => {
 
-                let data = doc.data();
-                data.id = doc.id;
+        let data = doc.data();
+        data.id = doc.id;
 
-                let message = new Message();
-                message.fromJSON(data);
+        let message = new Message();
+        message.fromJSON(data);
 
-                let me = (data.from === this._user.email);
+        let me = (data.from === this._user.email);
 
-                if (!this.el.panelMessagesContainer.querySelector('#_' + data.id)) {
+        let view = message.getViewElement(me);
 
-                    if (!me) {
-                        doc.ref.set({
-                            status: 'read'
-                        }, {
-                            merge: true
-                        });
-                    }
+        if (!me) {
+            doc.ref.set({ status: 'read' }, { merge: true });
+        }
 
-                    let view = message.getViewElement(me);
+        if (!this.el.panelMessagesContainer.querySelector('#_' + data.id)) {
+            this.el.panelMessagesContainer.appendChild(view);
+        } else {
+            let existingEl = this.el.panelMessagesContainer.querySelector('#_' + data.id);
+            existingEl.innerHTML = view.innerHTML;
+        }
 
-                    this.el.panelMessagesContainer.querySelector('#_' + data.id).innerHTML = view.innerHTML
+    });
 
-                } else {
+    if (autoScroll) {
+        this.el.panelMessagesContainer.scrollTop = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight;
+    } else {
+        this.el.panelMessagesContainer.scrollTop = scrollTop;
+    }
 
-                    let view = message.getViewElement(me);
-                    this.el.panelMessagesContainer.appendChild(view);
-
-
-                }
-
-
-                if (this.el.panelMessagesContainer.querySelector('#_' + data.id) && me) {
-                    let msgEl = this.el.panelMessagesContainer.querySelector('#_' + data.id)
-
-                    msgEl.querySelector('.message-status').innerHTML = message.getStatusViewElement().outerHTML;
-                }
-
-            });
-
-
-            if (autoScroll) {
-
-                this.el.panelMessagesContainer.scrollTop = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight
-
-            } else {
-                this.el.panelMessagesContainer.scrollTop = scrollTop;
-            }
-
-        });
+});
 
     }
 
@@ -652,7 +634,7 @@ export class WhatssappController {
             let file = this.el.inputDocument.files[0];
             let base64 = this.el.imgPanelDocumentPreview.src;
 
-            if (fileType === 'apllication/pdf') {
+            if (file.type === 'application/pdf') {
 
                 Base64.toFile(base64).then(filePreview => {
 
@@ -674,13 +656,25 @@ export class WhatssappController {
         // mostra os contatos
         this.el.btnAttachContact.on('click', e => {
 
-            this.el.modalContacts.show()
+            this._contactsController = new ContactsController(this.el.modalContacts, this._user);
+
+            this._contactsController.on('select', contact => {
+
+                Message.sendContact(
+                    this._contactActive.chatId,
+                    this._user.email,
+                    contact
+                );
+
+            })
+
+            this._contactsController.open();
 
         });
         // retira o modal dos contatos
         this.el.btnCloseModalContacts.on('click', e => {
 
-            this.el.modalContacts.hide()
+            this._contactsController.close();
 
         });
         // inicia a gravação do audio
