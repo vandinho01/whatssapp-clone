@@ -62,13 +62,25 @@ export class MicrophoneController extends ClassEvent {
                 });
                 // variavel que tem o nome do arquivo gerado
                 let filename = `rec${Date.now()}.webm`;
-                // file gera um arquivo do blob, com o nome, tipo do arquivo e a data da ultima modificação
-                let file = new File([blob], filename, {
-                    type: this._mimeType,
-                    lastModified: Date.now()
-                });
 
-                console.log('file', file);
+                let audioContext = new AudioContext();
+                let reader = new FileReader();
+
+                reader.onload = e => {
+
+                    audioContext.decodeAudioData(reader.result).then(decode => {
+                        // file gera um arquivo do blob, com o nome, tipo do arquivo e a data da ultima modificação
+                        let file = new File([blob], filename, {
+                            type: this._mimeType,
+                            lastModified: Date.now()
+                        });
+
+                        this.trigger('recorded', file, decode);
+
+                    });
+
+                }
+                reader.readAsArrayBuffer(blob)
 
             });
             // chama a midia para gravar
@@ -104,7 +116,7 @@ export class MicrophoneController extends ClassEvent {
 
     }
 
-    stopTimer(){
+    stopTimer() {
         clearInterval(this._recordMicrophoneInterval);
     }
 
