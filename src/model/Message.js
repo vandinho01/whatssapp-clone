@@ -73,7 +73,7 @@ export class Message extends Model {
                                         </div>
                                     </div>
                                     <div class="_1lC8v">
-                                        <div dir="ltr" class="_3gkvk selectable-text invisible-space copyable-text">${this.contact.name}</div>
+                                        <div dir="ltr" class="_3gkvk selectable-text invisible-space copyable-text">${this.content.name}</div>
                                     </div>
                                     <div class="_3a5-b">
                                         <div class="_1DZAH" role="button">
@@ -94,12 +94,6 @@ export class Message extends Model {
                     img.src = this.content.photo;
                     img.show();
                 }
-
-                div.querySelector('.btn-message-send').on('click', e=>{
-
-                    console.log('Enviar mensagem')
-
-                });
 
                 break;
 
