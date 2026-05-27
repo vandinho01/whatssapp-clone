@@ -2,7 +2,7 @@ import { Firebase } from "./Firebase";
 
 export class Upload {
 
-    static send(file, from){
+    static send(file, from) {
 
         return new Promise((s, f) => {
 
@@ -18,7 +18,9 @@ export class Upload {
 
             }, () => {
 
-                s(uploadTask.snapshot);
+                uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+                    s({ downloadURL, ref: uploadTask.snapshot.ref });
+                });
 
             });
 

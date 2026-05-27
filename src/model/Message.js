@@ -4,60 +4,111 @@ import { Format } from "../util/Format";
 import { Upload } from "../util/Upload";
 
 export class Message extends Model {
-
     constructor() {
         super();
     }
 
-    get id() { return this._data.id; }
-    set id(value) { return this._data.id = value; }
+    get id() {
+        return this._data.id;
+    }
+    set id(value) {
+        return (this._data.id = value);
+    }
 
-    get content() { return this._data.content; }
-    set content(value) { return this._data.content = value; }
+    get content() {
+        return this._data.content;
+    }
+    set content(value) {
+        return (this._data.content = value);
+    }
 
-    get type() { return this._data.type; }
-    set type(value) { return this._data.type = value; }
+    get type() {
+        return this._data.type;
+    }
+    set type(value) {
+        return (this._data.type = value);
+    }
 
-    get timeStamp() { return this._data.timeStamp; }
-    set timeStamp(value) { return this._data.timeStamp = value; }
+    get timeStamp() {
+        return this._data.timeStamp;
+    }
+    set timeStamp(value) {
+        return (this._data.timeStamp = value);
+    }
 
-    get status() { return this._data.status; }
-    set status(value) { return this._data.status = value; }
+    get status() {
+        return this._data.status;
+    }
+    set status(value) {
+        return (this._data.status = value);
+    }
 
-    get preview() { return this._data.preview; }
-    set preview(value) { return this._data.preview = value; }
+    get preview() {
+        return this._data.preview;
+    }
+    set preview(value) {
+        return (this._data.preview = value);
+    }
 
-    get info() { return this._data.info; }
-    set info(value) { return this._data.info = value; }
+    get info() {
+        return this._data.info;
+    }
+    set info(value) {
+        return (this._data.info = value);
+    }
 
-    get fileType() { return this._data.fileType; }
-    set fileType(value) { return this._data.fileType = value; }
+    get fileType() {
+        return this._data.fileType;
+    }
+    set fileType(value) {
+        return (this._data.fileType = value);
+    }
 
-    get filename() { return this._data.filename; }
-    set filename(value) { return this._data.filename = value; }
+    get filename() {
+        return this._data.filename;
+    }
+    set filename(value) {
+        return (this._data.filename = value);
+    }
 
-    get size() { return this._data.size; }
-    set size(value) { return this._data.size = value; }
+    get size() {
+        return this._data.size;
+    }
+    set size(value) {
+        return (this._data.size = value);
+    }
 
-    get from() { return this._data.from; }
-    set from(value) { return this._data.from = value; }
+    get from() {
+        return this._data.from;
+    }
+    set from(value) {
+        return (this._data.from = value);
+    }
 
-    get photo() { return this._data.photo; }
-    set photo(value) { return this._data.photo = value; }
+    get photo() {
+        return this._data.photo;
+    }
+    set photo(value) {
+        return (this._data.photo = value);
+    }
 
-    get duration() { return this._data.duration; }
-    set duration(value) { return this._data.duration = value; }
+    get duration() {
+        return this._data.duration;
+    }
+    set duration(value) {
+        return (this._data.duration = value);
+    }
 
     getViewElement(me = true) {
+        let div = document.createElement("div");
+        div.id = `_${this.id}`;
+        div.className = "message";
 
-        let div = document.createElement('div');
-        div.id = `_${this.id}`
-        div.className = 'message'
-
-        div.id = '_' + this.id;
+        div.id = "_" + this.id;
 
         switch (this.type) {
-            case 'contact':
+            case "contact":
+                console.log("content do contato:", this.content);
                 div.innerHTML = `
                         <div class="_3_7SH kNKwo tail">
                             <span class="tail-container"></span>
@@ -96,15 +147,15 @@ export class Message extends Model {
                         </div>
                     `;
 
-                if(this.content.photo) {
-                    let img = div.querySelector('.photo-contact-sended');
+                if (this.content.photo) {
+                    let img = div.querySelector(".photo-contact-sended");
                     img.src = this.content.photo;
                     img.show();
                 }
 
                 break;
 
-            case 'image':
+            case "image":
                 div.innerHTML = `
                     <div class="_3_7SH _3qMSo">
                         <div class="KYpDv">
@@ -147,19 +198,20 @@ export class Message extends Model {
                     </div>
                 `;
 
-                div.querySelector('.message-photo').on('load', e => {
+                let imgEl = div.querySelector(".message-photo");
+                imgEl.src = this.content;
 
-                    div.querySelector('.message-photo').show();
-                    div.querySelector('._340lu').hide();
-                    div.querySelector('._3v3PK').css({
-                        height: 'auto'
+                div.querySelector(".message-photo").on("load", (e) => {
+                    div.querySelector(".message-photo").show();
+                    div.querySelector("._34Olu").hide();
+                    div.querySelector("._3v3PK").css({
+                        height: "auto",
                     });
-
                 });
 
                 break;
 
-            case 'document':
+            case "document":
                 div.innerHTML = `
                     <div class="_3_7SH _1ZPgd">
                         <div class="_1fnMt _2CORf">
@@ -170,7 +222,7 @@ export class Message extends Model {
                                         <div class="JdzFp message-file-icon icon-doc-pdf"></div>
                                     </div>
                                     <div class="nxILt">
-                                        <span dir="auto" class="message-filename">${this.filename}</span>
+                                        <span dir="auto" class="message-filename">${this.filename || "Carregando.."}</span>
                                     </div>
                                     <div class="_17viz">
                                         <span data-icon="audio-download" class="message-file-download">
@@ -188,9 +240,9 @@ export class Message extends Model {
                                 </div>
                             </a>
                             <div class="_3cMIj">
-                                <span class="PyPig message-file-info">${this.info}</span>
-                                <span class="PyPig message-file-type">${this.fileType}</span>
-                                <span class="PyPig message-file-size">${this.size}</span>
+                                <span class="PyPig message-file-info">${this.info || ""}</span>
+                                <span class="PyPig message-file-type">${this.fileType || ""}</span>
+                                <span class="PyPig message-file-size">${this.size || ""}</span>
                             </div>
                             <div class="_3Lj_s">
                                 <div class="_1DZAH" role="button">
@@ -202,15 +254,13 @@ export class Message extends Model {
                                         
                 `;
 
-                div.on('click', e => {
-
+                div.on("click", (e) => {
                     window.open(this.content);
-
                 });
 
                 break;
 
-            case 'audio':
+            case "audio":
                 div.innerHTML = `
                     <div class="_3_7SH _17oKL">
                         <div class="_2N_Df LKbsn">
@@ -289,67 +339,62 @@ export class Message extends Model {
                     </div>
                 `;
 
-                if(this.photo) {
-                    let img = div.querySelector('.message-photo');
+                if (this.photo) {
+                    let img = div.querySelector(".message-photo");
                     img.src = this.photo;
                     img.show();
                 }
 
-                let audioEl = div.querySelector('audio');
-                let loadEl = div.querySelector('.audio-load');
-                let btnPlay = div.querySelector('.audio-play');
-                let btnPause = div.querySelector('.audio-play');
-                let inputRange = div.querySelector('[type=range');
-                let audioDuration =  div.querySelector('.message-audio-duration');
-                
-                audioEl.onloadeddata = e => {
+                let audioEl = div.querySelector("audio");
+                let loadEl = div.querySelector(".audio-load");
+                let btnPlay = div.querySelector(".audio-play");
+                let btnPause = div.querySelector(".audio-play");
+                let inputRange = div.querySelector("[type=range");
+                let audioDuration = div.querySelector(".message-audio-duration");
 
+                audioEl.onloadeddata = (e) => {
                     loadEl.hide();
                     btnPlay.show();
-
                 };
 
-                audioEl.onplay = e => {
+                audioEl.onplay = (e) => {
                     btnPlay.hide();
                     btnPause.show();
-                }
+                };
 
-                audioEl.onpause = e => {
-
-                   audioDuration.innerHTML = Format.toTime(this.duration * 1000);
+                audioEl.onpause = (e) => {
+                    audioDuration.innerHTML = Format.toTime(this.duration * 1000);
                     btnPlay.show();
                     btnPause.hide();
-                }
+                };
 
-                audioEl.onended = e => {
-                   audioEl.currentTime = 0;
-                }
+                audioEl.onended = (e) => {
+                    audioEl.currentTime = 0;
+                };
 
-                audioEl.ontimeupdate = e => {
+                audioEl.ontimeupdate = (e) => {
                     btnPlay.hide();
                     btnPause.hide();
                     audioDuration.innerHTML = Format.toTime(audioEl.currentTime * 1000);
                     inputRange.value = (audioEl.currentTime * 1000) / this.duration;
 
-                    if(audioEl.paused){
-                       btnPlay.show(); 
+                    if (audioEl.paused) {
+                        btnPlay.show();
                     } else {
                         btnPause.show();
                     }
-                }
+                };
 
-                btnPlay.on('click', e=>{
+                btnPlay.on("click", (e) => {
                     audioEl.play();
                 });
 
-                btnPause.on('click', e=>{
+                btnPause.on("click", (e) => {
                     audioEl.pause();
                 });
 
-                inputRange.on('change', e=> {
-
+                inputRange.on("change", (e) => {
                     audioEl.currentTime = (inputRange * this.duration) / 100;
-
                 });
 
                 break;
@@ -373,168 +418,146 @@ export class Message extends Model {
             `;
         }
 
-        let className = 'message-in'
+        let className = "message-in";
 
         if (me) {
-            className = 'message-out'
+            className = "message-out";
 
-            div.querySelector('.message-time').parentElement.appendChild(this.getStatusViewElement());
-
+            div
+                .querySelector(".message-time")
+                .parentElement.appendChild(this.getStatusViewElement());
         }
 
-        div.firstElementChild.classList.add(className)
+        div.firstElementChild.classList.add(className);
 
         return div;
-
     }
 
     static upload(file, from) {
-
         return Upload.send(file, from);
-
     }
 
-    static sendContact (chatId, from, contact){
-
-        return Message.send(chatId, from, 'contact', contact);
-
+    static sendContact(chatId, from, contact) {
+        return Message.send(chatId, from, "contact", {
+            name: contact.name,
+            email: contact.email,
+            photo: contact.photo || null,
+        });
     }
 
-    static sendAudio(chatId, from, file, metadata, phoyo){
-
-        return Message.send(chatId, from, 'audio', '').then(msgRef => {
-            Message.upload(file, from).then(snapshot => {
-                let downloadFile = snapshot.downloadURL;
-
-                msgRef.set({
-                    content: downloadFile,
-                    size: file.size,
-                    fileType: file.type,
-                    status: 'sent',
-                    photo,
-                    duration: metadata.duration
-                }, {
-                    merge: true
+    static sendAudio(chatId, from, file, metadata, photo) {
+        return Message.send(chatId, from, "audio", "").then((msgRef) => {
+            Message.upload(file, from).then((snapshot) => {
+                snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    msgRef.set(
+                        {
+                            content: downloadURL,
+                            size: file.size,
+                            fileType: file.type,
+                            status: "sent",
+                            photo,
+                            duration: metadata.duration,
+                        },
+                        {
+                            merge: true,
+                        },
+                    );
                 });
             });
         });
-
     }
 
     static sendDocument(chatId, from, file, filePreview, info) {
-
-        Message.send(chatId, from, 'document').then(msgRef => {
-
-            Message.upload(file, from).then(snapshot => {
-
-                let downloadFile = snapshot.downloadURL;
-
-                if (filePreview) {
-
-                    Message.upload(filePreview, from).then(snapshot2 => {
-
-                        let downloadPreview = snapshot2.downloadURL;
-
-                        msgRef.set({
-                            content: downloadFile,
-                            preview: downloadPreview,
-                            filename: file.name,
-                            size: file.size,
-                            fileType: file.type,
-                            status: 'sent',
-                            info
-                        }, {
-                            merge: true
+        Message.send(chatId, from, "document", "").then((msgRef) => {
+            Message.upload(file, from).then((snapshot) => {
+                snapshot.ref.getDownloadURL().then((downloadFile) => {
+                    if (filePreview) {
+                        Message.upload(filePreview, from).then((snapshot2) => {
+                            snapshot2.ref.getDownloadURL().then((downloadPreview) => {
+                                msgRef.set(
+                                    {
+                                        content: downloadFile,
+                                        preview: downloadPreview,
+                                        filename: file.name,
+                                        size: file.size,
+                                        fileType: file.type,
+                                        status: "sent",
+                                        info,
+                                    },
+                                    { merge: true },
+                                );
+                            });
                         });
-                    });
-
-                } else {
-
-                    msgRef.set({
-                        content: downloadFile,
-                        filename: file.name,
-                        size: file.size,
-                        fileType: file.type,
-                        status: 'sent',
-                    }, {
-                        merge: true
-                    });
-
-                }
-
+                    } else {
+                        msgRef.set(
+                            {
+                                content: downloadFile,
+                                filename: file.name,
+                                size: file.size,
+                                fileType: file.type,
+                                status: "sent",
+                            },
+                            { merge: true },
+                        );
+                    }
+                });
             });
-
         });
-
     }
 
     static sendImage(chatId, from, file) {
-
         return new Promise((s, f) => {
-
-            Message.upload(file, from).then(snapshot => {
-
-                Message.send(
-                    chatId,
-                    from,
-                    'image',
-                    snapshot.downloadURL
-                ).then(() => {
-
-                    s();
-
+            Message.upload(file, from).then((snapshot) => {
+                // Forma nova do Firebase Storage
+                snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    Message.send(chatId, from, "image", downloadURL).then(() => {
+                        s();
+                    });
                 });
-
             });
-
         });
-
     }
 
     static send(chatId, from, type, content) {
-
         return new Promise((s, f) => {
-            Message.getRef(chatId).add({
-                content,
-                timeStamp: new Date(),
-                status: 'wait',
-                type,
-                from
-            }).then(result => {
-
-                let docRef = result.parent.doc(result.id)
-
-                docRef.set({
-                    status: 'sent'
-                }, {
-                    merge: true
-                }).then(() => {
-                    s(docRef);
+            Message.getRef(chatId)
+                .add({
+                    content: content !== undefined ? content : null,
+                    timeStamp: new Date(),
+                    status: "wait",
+                    type,
+                    from,
                 })
+                .then((result) => {
+                    let docRef = result.parent.doc(result.id);
 
-            });
-
+                    docRef
+                        .set(
+                            {
+                                status: "sent",
+                            },
+                            {
+                                merge: true,
+                            },
+                        )
+                        .then(() => {
+                            s(docRef);
+                        });
+                });
         });
-
     }
 
-
     static getRef(chatId) {
-
-        return Firebase.db()
-            .collection('chats')
-            .doc(chatId)
-            .collection('messages')
-
+        return Firebase.db().collection("chats").doc(chatId).collection("messages");
     }
 
     getStatusViewElement() {
-        let div = document.createElement('div');
+        let div = document.createElement("div");
 
-        div.className = 'message-status'
+        div.className = "message-status";
 
         switch (this.status) {
-            case 'wait':
+            case "wait":
                 div.innerHTML = `
                     <span data-icon="msg-time">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15">
@@ -544,7 +567,7 @@ export class Message extends Model {
                 `;
                 break;
 
-            case 'sent':
+            case "sent":
                 div.innerHTML = `
                     <span data-icon="msg-check">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15">
@@ -554,7 +577,7 @@ export class Message extends Model {
                 `;
                 break;
 
-            case 'received':
+            case "received":
                 div.innerHTML = `
                     <span data-icon="msg-dblcheck">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15">
@@ -564,7 +587,7 @@ export class Message extends Model {
                 `;
                 break;
 
-            case 'read':
+            case "read":
                 div.innerHTML = `
                     <span data-icon="msg-dblcheck-ack">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15">
@@ -577,6 +600,4 @@ export class Message extends Model {
 
         return div;
     }
-
-
 }

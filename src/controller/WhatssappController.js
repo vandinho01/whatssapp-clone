@@ -170,7 +170,7 @@ export class WhatssappController {
         this._contactActive = contact;
 
         this.el.activeName.innerHTML = contact.name;
-        this.el.activeStatus.innerHTML = contact.status;
+        this.el.activeStatus.innerHTML = contact.status || 'Online';
 
         if (contact.photo) {
             let img = this.el.activePhoto;
@@ -187,79 +187,79 @@ export class WhatssappController {
 
         Message.getRef(this._contactActive.chatId).orderBy('timeStamp').onSnapshot(docs => {
 
-    let scrollTop = this.el.panelMessagesContainer.scrollTop;
-    let scrollTopMax = (this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight);
-    let autoScroll = (scrollTop >= scrollTopMax);
+            let scrollTop = this.el.panelMessagesContainer.scrollTop;
+            let scrollTopMax = (this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight);
+            let autoScroll = (scrollTop >= scrollTopMax);
 
-    docs.forEach(doc => {
+            docs.forEach(doc => {
 
-        let data = doc.data();
-        data.id = doc.id;
+                let data = doc.data();
+                data.id = doc.id;
 
-        let message = new Message();
-        message.fromJSON(data);
+                let message = new Message();
+                message.fromJSON(data);
 
-        let me = (data.from === this._user.email);
-        let view = message.getViewElement(me);
+                let me = (data.from === this._user.email);
+                let view = message.getViewElement(me);
 
-        if(!this.el.panelMessagesContainer.querySelector('#_' + data.id)){
-            if(!me) {
+                if (!this.el.panelMessagesContainer.querySelector('#_' + data.id)) {
+                    if (!me) {
 
-                doc.ref.set({
-                    status: 'read'
-                }, {
-                    merge: true
-                });
-            }
+                        doc.ref.set({
+                            status: 'read'
+                        }, {
+                            merge: true
+                        });
+                    }
 
-            this.el.panelMessagesContainer.appendChild(view);
-        } else {
+                    this.el.panelMessagesContainer.appendChild(view);
+                } else {
 
-            let parent = this.el.panelMessagesContainer.querySelector('#_' + data.id).parentNode;
-            parent.replaceChild(view, this.el.panelMessagesContainer.querySelector('#_' + data.id));
-        }
+                    let parent = this.el.panelMessagesContainer.querySelector('#_' + data.id).parentNode;
+                    parent.replaceChild(view, this.el.panelMessagesContainer.querySelector('#_' + data.id));
+                }
 
-        if(this.el.panelMessagesContainer.querySelector('#_' + data.id) && me){
+                if (this.el.panelMessagesContainer.querySelector('#_' + data.id) && me) {
 
-            let msgEl = this.el.panelMessagesContainer.querySelector('#_' + data.id);
+                    let msgEl = this.el.panelMessagesContainer.querySelector('#_' + data.id);
 
-            msgEl.querySelector('.message-status').innerHTML = message.getStatusViewElement().outerHTML;
+                    msgEl.querySelector('.message-status').innerHTML = message.getStatusViewElement().outerHTML;
 
-        }
+                }
 
-        if(message.type === 'contact'){
+                if (message.type === 'contact') {
 
-            view.querySelector('.btn-message-send').on('click', e=>{
+                    view.querySelector('.btn-message-send').on('click', e => {
 
-                Chat.createIfNotExists(this._user.email, message.content.email).then(chat => {
+                        Chat.createIfNotExists(this._user.email, message.content.email).then(chat => {
 
-                    let contact = new User(message.content.email);
-                    contact.on('datachange', data => {
-                        contact.chatId = chat.id;
-                        this._user.addContact(contact);
-                        this._user.chatId = chat.id;
+                            let contact = new User(message.content.email);
+                            contact.on('datachange', data => {
+                                contact.chatId = chat.id;
+                                this._user.addContact(contact);
+                                this._user.chatId = chat.id;
 
-                        contact.addContact(this._user);
+                                contact.addContact(this._user);
 
-                        this.setActiveChat(contact);
+                                this.setActiveChat(contact);
+
+                            });
+
+                        });
 
                     });
 
-                });
+                }
 
             });
 
-        }
+            if (autoScroll) {
+                this.el.panelMessagesContainer.scrollTop = (this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight);
+            } else {
+                this.el.panelMessagesContainer.scrollTop = scrollTop;
+            }
 
-    });
-
-    if (autoScroll) {
-        this.el.panelMessagesContainer.scrollTop = (this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight);
-    } else {
-        this.el.panelMessagesContainer.scrollTop = scrollTop;
-    }
-
-});
+        });
 
     }
 
@@ -390,12 +390,12 @@ export class WhatssappController {
 
         });
 
-        this.el.inputProfilePhoto.on('change', e=>{
-            if(this.el.inputProfilePhoto.files.length > 0){
+        this.el.inputProfilePhoto.on('change', e => {
+            if (this.el.inputProfilePhoto.files.length > 0) {
 
                 let file = this.el.inputProfilePhoto.files[0];
 
-                Upload.send(file, this._user.email).then(snapshot=>{
+                Upload.send(file, this._user.email).then(snapshot => {
 
                     this._user.photo = snapshot.downloadURL;
                     this._user.save().then(() => {
@@ -687,29 +687,27 @@ export class WhatssappController {
         })
         // envia o documento
         this.el.btnSendDocument.on('click', e => {
-
             let file = this.el.inputDocument.files[0];
             let base64 = this.el.imgPanelDocumentPreview.src;
 
             if (file.type === 'application/pdf') {
 
-                Base64.toFile(base64).then(filePreview => {
-
-                    Message.sendDocument(this._contactActive.chatId, this._user.email, file, filePreview,
+                if (base64 && base64 !== 'http://localhost:8080/null' && base64 !== window.location.href + 'null') {
+                    Base64.toFile(base64).then(filePreview => {
+                        Message.sendDocument(this._contactActive.chatId, this._user.email, file, filePreview,
+                            this.el.infoPanelDocumentPreview.innerHTML);
+                    });
+                } else {
+                    Message.sendDocument(this._contactActive.chatId, this._user.email, file, null,
                         this.el.infoPanelDocumentPreview.innerHTML);
-
-                });
+                }
 
             } else {
-
                 Message.sendDocument(this._contactActive.chatId, this._user.email, file);
-
             }
 
             this.el.btnClosePanelDocumentPreview.click();
-
-
-        })
+        });
         // mostra os contatos
         this.el.btnAttachContact.on('click', e => {
 
@@ -766,7 +764,7 @@ export class WhatssappController {
 
             this._microphoneController.stopRecorder();
 
-            this._microphoneController.on('recorded', (file, metadata)=>{
+            this._microphoneController.on('recorded', (file, metadata) => {
 
                 Message.sendAudio(
                     this._contactActive.chatId,

@@ -1,14 +1,15 @@
-export class Base64{
+export class Base64 {
 
-    static getMimetype(urlBase64){
+    static getMimetype(urlBase64) {
 
         let regex = /^data:(.+);base64(.*)$/;
         let result = urlBase64.match(regex);
         let mimeType = result[1];
+        return result[1]
 
     }
 
-    static toFile(urlBase64){
+    static toFile(urlBase64) {
 
         let mimeType = Base64.getMimetype(urlBase64)
 
@@ -16,8 +17,8 @@ export class Base64{
         let filename = `file${Date.now()}.${ext}`
 
         return fetch(urlBase64)
-            .then( res => { return res.arrayBuffer();})
-            .then(buffer => {return new File([buffer], filename, { type: mimeType });})
+            .then(res => { return res.arrayBuffer(); })
+            .then(buffer => { return new File([buffer], filename, { type: mimeType }); })
 
     }
 
