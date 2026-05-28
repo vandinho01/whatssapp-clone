@@ -873,12 +873,40 @@ export class WhatssappController {
 
         });
 
-        this.el.btnSend.on('click', e => {
+        this.el.btnSend.on('click', async e => {
+            try {
+                const accountSid = process.env.TWILIO_ACCOUNT_SID;
+                const authToken = process.env.TWILIO_AUTH_TOKEN;
+                //variavel content vai pegar o que está escrito no campo de teto
+                const content = this.el.inputText.innerHTML;
+                //Pegar o ID do chat ativo no momento
+                const chatId = this._contactActive.chatId;
+                //Email do usuário que está enviando a mensagem
+                const email = this._user.email;
 
-            Message.send(this._contactActive.chatId, this._user.email, 'text', this.el.inputText.innerHTML);
+                await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+                        //Autenticação da Twillo via Base 64
+                        'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`)
+                    },
+                    //Corpo seguindo parametro da Twillo
+                    body: new URLSearchParams({
+                        To: 'whatsapp:+555194104673',
+                        From: 'whatsapp:+14155238886',
+                        Body: content
+                    })
+                });
 
-            this.el.inputText.innerHTML = '';
-            this.el.panelEmojis.removeClass('open');
+
+
+                Message.send(this._contactActive.chatId, this._user.email, 'text', this.el.inputText.innerHTML);
+
+                this.el.inputText.innerHTML = '';
+                this.el.panelEmojis.removeClass('open');
+            } catch(err){
+                console.log('[ERRO]', err);
+            }
 
         });
 
