@@ -83,7 +83,7 @@ O projeto tem como objetivo principal a construção de um clone do WhatsApp, co
 1. **Clone o repositório:**
 
    ```bash
-   git clone https://github.com/DevPatriick/Projeto-WhatsApp-Clone.git
+   git clone https://github.com/vandinho01/whatssapp-clone
 
 2. **Instale as dependências:**
 

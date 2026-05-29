@@ -22,6 +22,7 @@ export class WhatssappController {
         this.loadElements();
         this.initEvents();
         this.checkNotifications();
+        this.initTwilioMessages();
 
     }
 
@@ -116,6 +117,52 @@ export class WhatssappController {
             })
 
     }
+
+    initTwilioMessages() {
+
+    // Abre a "caixa de entrada" onde a Twilio deposita as mensagens do WhatsApp
+    Firebase.db()
+        .collection('twilio_messages')
+
+        // Coloca as mensagens em ordem cronológica (a mais antiga aparece primeiro)
+        .orderBy('timeStamp')
+        .onSnapshot(snapshot => {
+
+            // O Firebase nos diz o que mudou. Mostra cada mudança
+            snapshot.docChanges().forEach(change => {
+
+                // Validação apenas para novas mensagens
+                if (change.type === 'added') {
+
+                    // Pega o conteúdo da mensagem (texto, número de quem enviou, horário...)
+                    const data = change.doc.data();
+
+                    // O Firebase gera um ID único pra cada mensagem.
+                    // Precisamos dele para não mostrar a mesma mensagem duas vezes.
+                    data.id = change.doc.id;
+
+                    // Cria um objeto Message 
+                    // antes de colocar o conteúdo dentro
+                    let message = new Message();
+
+                    // Coloca os dados da mensagem dentro do objeto
+                    message.fromJSON(data);
+                    let view = message.getViewElement(false);
+
+                    if (!this.el.panelMessagesContainer.querySelector('#_' + data.id)) {
+
+                        // Tudo certo! Coloca a mensagem na tela.
+                        this.el.panelMessagesContainer.appendChild(view);
+
+                        // Rola a tela para baixo automaticamente,
+                        // igual ao WhatsApp faz quando chega uma mensagem nova
+                        this.el.panelMessagesContainer.scrollTop = 
+                            this.el.panelMessagesContainer.scrollHeight;
+                    }
+                }
+            });
+        });
+}
 
 
     initContacts() {
